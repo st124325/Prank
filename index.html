@@ -13,6 +13,8 @@ html,body{height:100%;background:#000;color:#fff;font-family:Inter,"Segoe UI",Ro
 #vid{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
 #vid.mirror{transform:scaleX(-1)}
 .nocam{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:radial-gradient(circle at 50% 40%,#2a1650,#050508);text-align:center;padding:20px}
+.nocam[hidden]{display:none}
+.nocam small{color:#aaa;font-size:12px;max-width:320px}
 .nocam button{background:var(--pur);color:#fff;border:0;border-radius:8px;padding:12px 18px;font-weight:700;font-size:16px}
 .shade-top{position:fixed;left:0;right:0;top:0;height:120px;background:linear-gradient(rgba(0,0,0,.55),transparent);pointer-events:none}
 .shade-bot{position:fixed;left:0;right:0;bottom:0;height:55%;background:linear-gradient(transparent,rgba(0,0,0,.6));pointer-events:none}
@@ -68,6 +70,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:Inter,"Segoe UI",Ro
   <div style="font-size:44px">📷</div>
   <div>Разрешите доступ к камере,<br>чтобы начать трансляцию</div>
   <button id="camBtn">Включить камеру</button>
+  <small id="camErr"></small>
 </div>
 <div class="shade-top"></div><div class="shade-bot"></div>
 
@@ -107,11 +110,23 @@ if(P.get('goal'))$('goalName').textContent=P.get('goal');
 /* --- camera (rear by default) --- */
 let facing=P.get('cam')==='front'?'user':'environment',stream=null;
 async function cam(){
-  try{
-    if(stream)stream.getTracks().forEach(t=>t.stop());
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1920},height:{ideal:1080}},audio:false});
-    $('vid').srcObject=stream;$('vid').classList.toggle('mirror',facing==='user');$('nocam').hidden=true;
-  }catch(e){$('nocam').hidden=false}
+  const v=$('vid');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    $('camErr').textContent=(location.protocol!=='https:'?'Откройте сайт по https://. ':'')+'Этот браузер не даёт доступ к камере. Если открыли из Telegram/Instagram — нажмите «⋯» → «Открыть в браузере» (Chrome или Safari).';
+    $('nocam').hidden=false;return}
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+  // try the chosen camera, then any camera
+  const tries=[{video:{facingMode:{ideal:facing}},audio:false},{video:true,audio:false}];
+  let err=null;
+  for(const c of tries){try{stream=await navigator.mediaDevices.getUserMedia(c);err=null;break}catch(e){err=e}}
+  if(err){
+    const n=err.name||'';
+    $('camErr').textContent=n==='NotAllowedError'?'Доступ к камере запрещён. Разрешите камеру для этого сайта в настройках браузера (значок 🔒 рядом с адресом) и нажмите кнопку ещё раз.':
+      n==='NotFoundError'?'Камера не найдена.':n==='NotReadableError'?'Камера занята другим приложением — закройте его и попробуйте снова.':'Ошибка камеры: '+(n||err);
+    $('nocam').hidden=false;return}
+  v.srcObject=stream;v.muted=true;v.setAttribute('playsinline','');
+  try{await v.play()}catch(e){}
+  v.classList.toggle('mirror',facing==='user');$('nocam').hidden=true;
 }
 $('camBtn').onclick=cam;
 $('flip').onclick=e=>{e.stopPropagation();facing=facing==='user'?'environment':'user';cam()};
@@ -163,7 +178,7 @@ setTimeout(donate,ri(6000,10000));
 /* --- sound: unlocked by the first tap anywhere --- */
 let ac=null,sound=false;
 function unlock(){if(sound)return;sound=true;$('hint').style.opacity=0;setTimeout(()=>$('hint').remove(),600);try{ac=new(window.AudioContext||window.webkitAudioContext)();speechSynthesis&&speechSynthesis.speak(new SpeechSynthesisUtterance(''))}catch(e){}}
-addEventListener('pointerdown',unlock,{once:false});
+addEventListener('pointerdown',()=>{unlock();const v=$('vid');if(v.paused&&v.srcObject)v.play().catch(()=>{})});
 setTimeout(()=>{const h=$('hint');if(h)h.style.opacity=0},6000);
 function ding(){if(!sound||!ac)return;try{const n=ac.currentTime;[988,1319,1760].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,n+i*.1);g.gain.linearRampToValueAtTime(.2,n+i*.1+.02);g.gain.exponentialRampToValueAtTime(.001,n+i*.1+.45);o.connect(g).connect(ac.destination);o.start(n+i*.1);o.stop(n+i*.1+.5)})}catch(e){}}
 function speak(t){if(!sound||!window.speechSynthesis)return;setTimeout(()=>{try{const u=new SpeechSynthesisUtterance(t);u.lang='ru-RU';u.rate=1.05;speechSynthesis.speak(u)}catch(e){}},800)}
