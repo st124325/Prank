@@ -2,289 +2,171 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🔴 LIVE — стрим</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>🔴 LIVE</title>
 <style>
-:root{--bg:#0e0e10;--panel:#18181b;--panel2:#1f1f23;--line:#2f2f35;--txt:#efeff1;--mut:#adadb8;--pur:#9147ff;--pur2:#772ce8;--red:#eb0400}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:Inter,Roobert,"Segoe UI",Roboto,Arial,sans-serif;font-size:13px;overflow:hidden}
-a{color:inherit;text-decoration:none}
+:root{--pur:#9147ff;--red:#eb0400}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#000;color:#fff;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;overscroll-behavior:none}
+#vid{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
+#vid.mirror{transform:scaleX(-1)}
+.nocam{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:radial-gradient(circle at 50% 40%,#2a1650,#050508);text-align:center;padding:20px}
+.nocam button{background:var(--pur);color:#fff;border:0;border-radius:8px;padding:12px 18px;font-weight:700;font-size:16px}
+.shade-top{position:fixed;left:0;right:0;top:0;height:120px;background:linear-gradient(rgba(0,0,0,.55),transparent);pointer-events:none}
+.shade-bot{position:fixed;left:0;right:0;bottom:0;height:55%;background:linear-gradient(transparent,rgba(0,0,0,.6));pointer-events:none}
 /* top bar */
-.top{height:50px;background:var(--panel);display:flex;align-items:center;gap:18px;padding:0 12px;box-shadow:0 1px 2px rgba(0,0,0,.6);position:relative;z-index:5}
-.logo{width:30px;height:30px;background:var(--pur);clip-path:polygon(0 0,100% 0,100% 62%,72% 90%,50% 90%,32% 100%,22% 100%,22% 90%,0 90%);position:relative}
-.logo:before,.logo:after{content:"";position:absolute;top:22%;width:3px;height:28%;background:var(--panel)}
-.logo:before{left:40%}.logo:after{left:64%}
-.top b{font-size:17px}
-.top .nav{color:var(--mut);font-weight:600;font-size:15px}
-.search{flex:1;max-width:400px;margin:0 auto;display:flex}
-.search input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:6px 0 0 6px;padding:7px 10px;color:var(--txt)}
-.search span{background:var(--panel2);padding:6px 10px;border-radius:0 6px 6px 0;color:var(--mut)}
-.btn{background:var(--pur);color:#fff;border:0;border-radius:4px;padding:6px 10px;font-weight:600;cursor:pointer;font-size:13px}
-.btn.g{background:#2f2f35}
-.ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ff6ec7,#9147ff);flex:none}
-/* layout */
-.wrap{display:flex;height:calc(100% - 50px)}
-.side{width:240px;background:var(--panel);padding:10px 0;overflow:hidden;flex:none}
-.side h4{font-size:13px;text-transform:uppercase;padding:4px 10px 8px;color:var(--txt)}
-.ch{display:flex;align-items:center;gap:8px;padding:5px 10px}
-.ch .ava{width:30px;height:30px}
-.ch .n{flex:1;min-width:0}.ch .n div{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ch .n small{color:var(--mut);font-size:12px}
-.ch .v{font-size:12px;color:var(--mut);white-space:nowrap}
-.ch .v:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:4px}
-.main{flex:1;overflow-y:auto;min-width:0}
-.player{position:relative;background:#000;aspect-ratio:16/9;max-height:calc(100vh - 180px);width:100%;overflow:hidden}
-#game{position:absolute;inset:0;width:100%;height:100%;display:block}
-.cam{position:absolute;right:2%;bottom:4%;width:22%;aspect-ratio:4/3;border:3px solid var(--pur);border-radius:10px;overflow:hidden;background:#111;box-shadow:0 0 25px rgba(145,71,255,.6)}
-.cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-.player>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-.player>video.file{transform:none;object-fit:contain;background:#000}
-.cam canvas{width:100%;height:100%;display:block}
-.cam.demo .tag:before{content:"🎮 ";}
-.cam .fake{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:radial-gradient(circle at 50% 40%,#3a1f66,#0b0b10);color:#fff;cursor:pointer;text-align:center;font-weight:700;font-size:12px}
-.cam .fake .face{font-size:44px;animation:bob 2s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-4px) rotate(-4deg)}}
-.cam .tag{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:10px 6px 4px;font-weight:800;font-size:12px}
-.overlay-goal{position:absolute;left:2%;top:4%;width:30%;background:rgba(0,0,0,.6);border-radius:8px;padding:8px 10px;font-weight:700;backdrop-filter:blur(3px)}
-.bar{height:10px;background:#333;border-radius:5px;margin-top:6px;overflow:hidden}
+.top{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 10px) 12px 0;display:flex;align-items:center;gap:8px}
+.ava{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff6ec7,#9147ff);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.who{min-width:0}
+.who b{font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000}
+.who small{font-size:11px;color:#ddd;text-shadow:0 1px 3px #000}
+.pill{background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:6px;padding:4px 8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.live{background:var(--red);border-radius:4px;padding:3px 6px;font-size:11px;font-weight:800;letter-spacing:.5px}
+.dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.sp{flex:1}
+.icon{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border:0;color:#fff;font-size:17px;flex:none}
+/* goal */
+.goal{position:fixed;left:12px;top:calc(env(safe-area-inset-top) + 58px);width:min(210px,55vw);background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border-radius:8px;padding:6px 8px;font-size:11px;font-weight:700}
+.goal .r{display:flex;justify-content:space-between;color:#ddd;margin-top:2px}
+.bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:4px;overflow:hidden}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#9147ff,#ff4fd8);width:0;transition:width .8s}
-.lastdon{position:absolute;left:2%;bottom:4%;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:6px;font-weight:700;font-size:12px}
-.lastdon span{color:#ffcc00}
 /* alert */
-.alert{position:absolute;left:50%;top:12%;transform:translate(-50%,-30px) scale(.8);opacity:0;transition:all .45s cubic-bezier(.2,1.6,.4,1);text-align:center;pointer-events:none;width:80%}
+.alert{position:fixed;left:50%;top:26%;transform:translate(-50%,-20px) scale(.85);opacity:0;transition:all .4s cubic-bezier(.2,1.5,.4,1);width:88%;max-width:420px;text-align:center;pointer-events:none;background:rgba(20,10,40,.72);backdrop-filter:blur(8px);border:2px solid var(--pur);border-radius:14px;padding:12px 14px;box-shadow:0 0 30px rgba(145,71,255,.55)}
 .alert.show{opacity:1;transform:translate(-50%,0) scale(1)}
-.alert .gif{font-size:clamp(40px,7vw,90px);animation:spin 1s ease-in-out infinite alternate}
-@keyframes spin{from{transform:rotate(-10deg) scale(1)}to{transform:rotate(10deg) scale(1.15)}}
-.alert .t{font-size:clamp(16px,2.6vw,34px);font-weight:900;text-shadow:0 0 6px #000,0 0 14px #000;color:#fff}
-.alert .t em{font-style:normal;color:#ffcc00}
-.alert .m{font-size:clamp(12px,1.6vw,20px);font-weight:700;margin-top:6px;text-shadow:0 0 6px #000,0 0 10px #000}
-.live{position:absolute;left:10px;top:10px;display:none}
-/* info */
-.info{display:flex;gap:12px;padding:14px 20px;align-items:flex-start}
-.info .big{width:64px;height:64px;border:3px solid var(--red);padding:2px;border-radius:50%;position:relative;flex:none}
-.info .big .ava{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px}
-.info .big .lv{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:var(--red);font-size:11px;font-weight:800;padding:0 5px;border-radius:4px}
-.info h1{font-size:18px;display:flex;align-items:center;gap:6px}
-.verified{width:16px;height:16px;border-radius:50%;background:var(--pur);display:inline-flex;align-items:center;justify-content:center;font-size:10px}
-.info .title{font-weight:600;font-size:14px;margin:4px 0}
-.info .cat{color:#bf94ff;font-weight:600}
-.tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.tags span{background:#2f2f35;border-radius:9px;padding:2px 8px;color:var(--mut);font-weight:600;font-size:12px}
-.info .right{margin-left:auto;text-align:right;white-space:nowrap}
-.viewers{color:#ff8280;font-weight:700;font-size:14px;margin:10px 0 2px}
-.uptime{color:var(--mut);font-variant-numeric:tabular-nums}
-.about{padding:10px 20px 30px;color:var(--mut)}
-.about b{color:var(--txt);font-size:16px}
+.alert .g{font-size:40px;animation:wob .6s ease-in-out infinite alternate}
+@keyframes wob{from{transform:rotate(-8deg)}to{transform:rotate(8deg) scale(1.1)}}
+.alert .t{font-size:18px;font-weight:900}
+.alert .t em{font-style:normal;color:#ffd24a}
+.alert .m{font-size:15px;font-weight:600;margin-top:4px;line-height:1.3}
 /* chat */
-.chat{width:340px;background:var(--panel);display:flex;flex-direction:column;border-left:1px solid var(--line);flex:none}
-.chat .hd{height:50px;display:flex;align-items:center;justify-content:center;font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--line);font-size:12px}
-.pinned{margin:8px;background:var(--panel2);border-radius:6px;padding:8px;font-size:12px;border:1px solid var(--line)}
-.pinned b{color:#ffcc00}
-.top-don{display:flex;gap:6px;padding:0 8px 6px;overflow:hidden}
-.top-don span{background:linear-gradient(90deg,#9147ff,#ff4fd8);border-radius:12px;padding:2px 8px;font-weight:700;font-size:11px;white-space:nowrap}
-#msgs{flex:1;overflow:hidden;padding:0 10px 6px;display:flex;flex-direction:column;justify-content:flex-end;line-height:20px}
-.msg{padding:3px 0;word-wrap:break-word;animation:in .2s}
-@keyframes in{from{opacity:0;transform:translateY(6px)}}
-.msg .u{font-weight:700}
-.badge{display:inline-block;width:16px;height:16px;border-radius:3px;vertical-align:-3px;margin-right:3px;font-size:10px;text-align:center;line-height:16px;font-weight:900}
-.b-sub{background:#9147ff}.b-mod{background:#00ad03}.b-vip{background:#e005b9}.b-prime{background:#0e9dd9}
-.msg.sys{background:rgba(145,71,255,.15);border-left:4px solid var(--pur);padding:6px 8px;margin:4px -10px;font-weight:600}
-.msg.don{background:rgba(255,204,0,.12);border-left:4px solid #ffcc00;padding:6px 8px;margin:4px -10px}
-.msg.don b{color:#ffcc00}
-.emo{font-size:18px;vertical-align:-3px}
-.inp{padding:10px;border-top:1px solid var(--line)}
-.inp input{width:100%;background:var(--panel2);border:2px solid transparent;border-radius:6px;padding:9px;color:var(--txt);font-size:13px}
-.inp input:focus{outline:0;border-color:var(--pur);background:#000}
-.inp .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.pts{color:var(--mut);font-weight:600}
-.start{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;cursor:pointer;text-align:center;padding:16px}
-.start h2{font-size:28px}.start p{color:var(--mut)}
-@media(max-width:1100px){.side{display:none}}
-@media(max-width:800px){
-  html,body{overflow:auto}
-  .wrap{flex-direction:column;height:auto}
-  .chat{width:100%;height:60vh;border-left:0}
-  .search,.top .nav{display:none}
-  .info{flex-wrap:wrap}.info .right{margin-left:0;text-align:left}
-}
+#chat{position:fixed;left:10px;right:70px;bottom:calc(env(safe-area-inset-bottom) + 62px);max-height:42%;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;-webkit-mask-image:linear-gradient(transparent,#000 30%);mask-image:linear-gradient(transparent,#000 30%);pointer-events:none}
+.msg{font-size:14px;line-height:1.3;text-shadow:0 1px 3px #000,0 0 2px #000;animation:in .25s;word-wrap:break-word}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.msg .u{font-weight:800}
+.badge{display:inline-block;width:15px;height:15px;border-radius:3px;background:var(--pur);font-size:9px;text-align:center;line-height:15px;margin-right:3px;vertical-align:1px}
+.b-mod{background:#00ad03}
+.msg.sys{background:rgba(145,71,255,.35);border-left:3px solid var(--pur);padding:4px 7px;border-radius:4px;font-weight:600;align-self:flex-start}
+.msg.don{background:rgba(255,190,0,.28);border-left:3px solid #ffd24a;padding:4px 7px;border-radius:4px;align-self:flex-start}
+.msg.don b{color:#ffd24a}
+/* bottom input */
+.bot{position:fixed;left:0;right:0;bottom:0;padding:8px 10px calc(env(safe-area-inset-bottom) + 10px);display:flex;gap:8px;align-items:center}
+.bot input{flex:1;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:10px 14px;color:#fff;font-size:15px}
+.bot input::placeholder{color:#ccc}
+.bot input:focus{outline:0;border-color:var(--pur)}
+.hearts{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 64px);width:44px;height:300px;pointer-events:none}
+.heart{position:absolute;bottom:0;left:10px;font-size:22px;animation:fly 2.6s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),-280px) scale(1.3);opacity:0}}
+.hint{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.55);padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;pointer-events:none;transition:opacity .5s}
 </style>
 </head>
 <body>
-<div class="start" id="start">
-  <h2>▶ Смотреть стрим</h2>
-  <p>Нажмите — включится звук и ваша камера. Вы в эфире!</p>
-  <button class="btn g" id="pickFile" style="font-size:15px;padding:10px 16px">📁 Или выбрать своё видео</button>
-  <input type="file" id="file" accept="video/*" hidden>
+<video id="vid" autoplay playsinline muted></video>
+<div class="nocam" id="nocam" hidden>
+  <div style="font-size:44px">📷</div>
+  <div>Разрешите доступ к камере,<br>чтобы начать трансляцию</div>
+  <button id="camBtn">Включить камеру</button>
 </div>
+<div class="shade-top"></div><div class="shade-bot"></div>
 
 <div class="top">
-  <div class="logo"></div>
-  <span class="nav">Отслеживаемое</span><span class="nav">Просмотр</span>
-  <div class="search"><input placeholder="Поиск"><span>🔍</span></div>
-  <button class="btn g">💎</button>
-  <button class="btn">Войти</button>
-  <div class="ava"></div>
+  <div class="ava">😎</div>
+  <div class="who"><b id="name"></b><small>IRL · Пранки на улице</small></div>
+  <span class="sp"></span>
+  <span class="live">LIVE</span>
+  <span class="pill">👁 <span id="views">0</span></span>
+  <span class="pill"><span class="dot"></span><span id="up">0:00</span></span>
+  <button class="icon" id="flip" title="Сменить камеру">🔄</button>
 </div>
 
-<div class="wrap">
-  <aside class="side">
-    <h4>Рекомендуемые каналы</h4>
-    <div id="side"></div>
-  </aside>
-
-  <main class="main">
-    <div class="player">
-      <canvas id="game"></canvas>
-      <div class="overlay-goal">🎯 Цель: <span id="goalName">новый ПК</span>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;color:#ddd"><span id="goalNow">0 ₽</span><span id="goalMax">500 000 ₽</span></div>
-        <div class="bar"><i id="goalBar"></i></div>
-      </div>
-      <div class="cam" id="cam">
-        <div class="fake" id="camFake"><div class="face">😎</div>Нажми, чтобы<br>включить камеру</div>
-        <video id="vid" autoplay playsinline muted></video>
-        <div class="tag" id="camTag"></div>
-      </div>
-      <div class="lastdon">Последний донат: <span id="lastDon">—</span></div>
-      <div class="alert" id="alert"><div class="gif" id="aGif">💸</div><div class="t" id="aT"></div><div class="m" id="aM"></div></div>
-    </div>
-
-    <div class="info">
-      <div class="big"><div class="ava">😎</div><span class="lv">В ЭФИРЕ</span></div>
-      <div>
-        <h1><span class="sname"></span> <span class="verified">✔</span></h1>
-        <div class="title">🔥 ПОКАЗЫВАЮ СВОЮ ДЕМКУ | РЕКОРД ОНЛАЙНА | !донат !тг</div>
-        <div class="cat">Демка / Software and Game Development</div>
-        <div class="tags"><span>Русский</span><span>Разработка</span><span>ДропсыВключены</span><span>Геймдев</span></div>
-      </div>
-      <div class="right">
-        <button class="btn">💜 Отслеживать</button> <button class="btn g">⭐ Подписаться</button>
-        <div class="viewers">👤 <span id="views">0</span></div>
-        <div class="uptime" id="uptime">0:00:00</div>
-      </div>
-    </div>
-    <div class="about"><b>О канале <span class="sname"></span></b><br><span id="followers">2,4 млн</span> фолловеров · Лучший стример по версии всех, кто в чате</div>
-  </main>
-
-  <aside class="chat">
-    <div class="hd">Чат трансляции</div>
-    <div class="pinned">📌 <b>Закреплено:</b> Донат от 100 ₽ зачитывается голосом! Демка выходит сегодня 🚀</div>
-    <div class="top-don" id="topDon"></div>
-    <div id="msgs"></div>
-    <div class="inp">
-      <input id="say" placeholder="Отправить сообщение" maxlength="200">
-      <div class="row"><span class="pts">💠 <span id="pts">12 450</span></span><button class="btn" id="send">Чат</button></div>
-    </div>
-  </aside>
+<div class="goal">🎯 <span id="goalName">На новый телефон</span>
+  <div class="bar"><i id="gbar"></i></div>
+  <div class="r"><span id="gnow">0 ₽</span><span id="gmax">15 000 ₽</span></div>
 </div>
+
+<div class="alert" id="alert"><div class="g" id="ag">💸</div><div class="t" id="at"></div><div class="m" id="am"></div></div>
+<div id="chat"></div>
+<div class="hearts" id="hearts"></div>
+<div class="hint" id="hint">🔊 Нажми, чтобы включить звук</div>
+
+<div class="bot"><input id="say" placeholder="Написать в чат…" maxlength="150" enterkeyhint="send"></div>
 
 <script>
 const $=id=>document.getElementById(id);
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const ri=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
-const params=new URLSearchParams(location.search);
-const NAME=params.get('name')||'Legenda_Streama';
-document.querySelectorAll('.sname').forEach(e=>e.textContent=NAME);
-$('camTag').textContent=NAME;
-document.title='🔴 '+NAME+' — LIVE';
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=n=>n.toLocaleString('ru-RU');
+const P=new URLSearchParams(location.search);
+const NAME=P.get('name')||'sanya_irl';
+$('name').textContent=NAME;document.title='🔴 '+NAME+' — LIVE';
+if(P.get('goal'))$('goalName').textContent=P.get('goal');
 
-/* --- sidebar --- */
-const side=[['Buster','Just Chatting'],['evelone192','Counter-Strike 2'],['Mokrivskyi','Just Chatting'],['Exile','GTA V'],['shadowkekw','Dota 2'],['Recrent','Counter-Strike 2'],['dmitry_lixxx','Minecraft'],['StRoGo','Just Chatting'],['JesusAVGN','Just Chatting']];
-const cols=['#ff6ec7,#9147ff','#00c6ff,#0072ff','#f7971e,#ffd200','#56ab2f,#a8e063','#ee0979,#ff6a00','#8e2de2,#4a00e0'];
-$('side').innerHTML=side.map((s,i)=>`<div class="ch"><div class="ava" style="background:linear-gradient(135deg,${cols[i%6]})"></div><div class="n"><div>${s[0]}</div><small>${s[1]}</small></div><span class="v">${(ri(5,60)+ri(0,9)/10).toFixed(1).replace('.',',')} тыс.</span></div>`).join('');
+/* --- camera (rear by default) --- */
+let facing=P.get('cam')==='front'?'user':'environment',stream=null;
+async function cam(){
+  try{
+    if(stream)stream.getTracks().forEach(t=>t.stop());
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1920},height:{ideal:1080}},audio:false});
+    $('vid').srcObject=stream;$('vid').classList.toggle('mirror',facing==='user');$('nocam').hidden=true;
+  }catch(e){$('nocam').hidden=false}
+}
+$('camBtn').onclick=cam;
+$('flip').onclick=e=>{e.stopPropagation();facing=facing==='user'?'environment':'user';cam()};
+cam();
 
-/* --- viewers & uptime --- */
-let viewers=ri(8000,12000), t0=Date.now()-ri(1,2)*3600e3-ri(0,3500)*1e3;
-setInterval(()=>{viewers+=ri(-40,160);if(Math.random()<.02)viewers+=ri(2000,6000);$('views').textContent=fmt(viewers);},1200);
-setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$('uptime').textContent=`${Math.floor(s/3600)}:${String(Math.floor(s/60)%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`},1000);
-$('views').textContent=fmt(viewers);
+/* --- viewers & uptime (small streamer) --- */
+let viewers=ri(45,90);const t0=Date.now()-ri(4,25)*60e3;
+setInterval(()=>{viewers=Math.max(18,viewers+ri(-3,4));if(Math.random()<.03)viewers+=ri(8,25);$('views').textContent=viewers},2500);
+$('views').textContent=viewers;
+setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000),h=Math.floor(s/3600),m=Math.floor(s/60)%60,ss=String(s%60).padStart(2,'0');$('up').textContent=h?`${h}:${String(m).padStart(2,'0')}:${ss}`:`${m}:${ss}`},1000);
 
 /* --- chat --- */
-const users=['xX_Dimon_Xx','kotik228','NeoGamer','sanya_pro','Liza_nya','bratishka','MegaKek','vasyan_play','zloy_hamster','PoGChamp_RU','top4ik','mrakobes','anime_girl_777','dev_senior','kirill_ultra','nikita_gg','Tanya_UwU','shrek_is_love','ded_inside','progamer2011','OlegLOL','sonic_fast','bober_kurwa','FrontendKing','pixel_art','kokos','Mashenka','Ctrl_Z','lagger3000','bot_Vanya'];
-const ucol=['#ff4f4f','#1e90ff','#00ff7f','#ff69b4','#daa520','#9acd32','#ff7f50','#b22222','#5f9ea0','#8a2be2','#00bfff','#ffd700','#2e8b57'];
+const users=['kotik228','sanya_pro','Liza_nya','bratishka','vasyan_play','zloy_hamster','top4ik','dev_senior','nikita_gg','Tanya_UwU','ded_inside','OlegLOL','bober_kurwa','Mashenka','lagger3000','Dimas_77','ne_spal','koshka_mura','artemka','kirill_ultra'];
+const ucol=['#ff5c5c','#4fa3ff','#3dff8a','#ff7ac8','#ffcc33','#b4ff4f','#ff9a5c','#6ef0ff','#c08bff','#ffd700'];
 const colOf={};users.forEach(u=>colOf[u]=rnd(ucol));
-const phr=['ЛЕГЕНДА 🔥','демка просто разрыв','ааааа это гениально','KEKW','PogChamp PogChamp PogChamp','лучший стример снг','когда релиз???','я с работы смотрю 😂','{n} ты топ','как же это красиво','OMEGALUL','чат, это легендарно','мама смотрите я в чате','GG','+++++','LUL','сделай ещё раз!!','это на юнити?','а это сам делал?','подписался не глядя','ЭТО КЛИП','клипаем!!!','привет из Казахстана 🇰🇿','привет из Минска','привет с Украины','{n} заметь меня пж','💜💜💜💜','W','W STREAMER','у него 10к онлайна, а ты что сделал?','лагает? у меня норм','звук топ','демку в стим!!','за такую демку и донат не жалко','EZ','Kappa','гений геймдева','не спал 3 дня ради этого стрима','сколько лет делал?','{n} ответь в чате плиз','ЧАТ ВСТАЛ','ахахахах','это шедевр 10/10','я плачу это так красиво','НАКОНЕЦ ТО','ЗАШЁЛ С РЕКОМЕНДАЦИЙ, ОСТАЮСЬ'];
-const emo=['🔥','😂','💜','🤯','👑','🚀','😍','🗿','💀','🥶'];
-const msgs=$('msgs');
-function add(html,cls=''){const d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;msgs.appendChild(d);while(msgs.children.length>70)msgs.firstChild.remove();}
-function badges(){let b='';if(Math.random()<.45)b+='<span class="badge b-sub">★</span>';if(Math.random()<.05)b+='<span class="badge b-mod">⚔</span>';else if(Math.random()<.06)b+='<span class="badge b-vip">◆</span>';if(Math.random()<.08)b+='<span class="badge b-prime">♛</span>';return b}
-const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function chat(){const u=rnd(users);let t=esc(rnd(phr).replace('{n}','@'+NAME));if(Math.random()<.35)t+=' <span class="emo">'+rnd(emo).repeat(ri(1,3))+'</span>';add(`${badges()}<span class="u" style="color:${colOf[u]}">${u}</span>: ${t}`);}
-(function loop(){const burst=Math.random()<.1;chat();setTimeout(loop,burst?ri(40,120):ri(150,700));})();
-function send(){const v=$('say').value.trim();if(!v)return;add(`<span class="badge b-mod">⚔</span><span class="u" style="color:#9147ff">${esc(NAME)}</span>: ${esc(v)}`);$('say').value='';setTimeout(()=>{for(let i=0;i<5;i++)setTimeout(()=>add(`<span class="u" style="color:${rnd(ucol)}">${rnd(users)}</span>: ${rnd(['ОН ОТВЕТИЛ!!!','стример в чате 😱','+++','легенда пишет','PogChamp','скрин!!!'])}`),i*200)},400)}
-$('send').onclick=send;$('say').onkeydown=e=>{if(e.key==='Enter')send()};
+const phr=['кто это? 😂','привет прохожему 👋','скажи ему что он в прямом эфире','спроси как зовут','поздоровайся с чатом!','хахахаха','ору 😂😂','он не понял что происходит','KEKW','передай привет от чата','ахах лицо его','ну всё, он теперь звезда','пусть помашет в камеру!','спроси откуда он','+++','LUL','чат, он милый','давай следующего!','это лучший стрим','я с работы смотрю','ахахах он засмущался','спроси его чем занимается','скажи что у тебя 10к зрителей 😂','ЛЕГЕНДА','💜💜💜','@'+NAME+' красава','он думает это пранк 😏','пусть скажет что-нибудь чату','чат, пишите ему привет!','привет!!! 👋👋','привеет','хай 👋','спроси у него совет по жизни','скажи чтоб станцевал 💃','это где вообще?','город какой?','вот это реакция 😂','W прохожий','GG','лайк за прохожего ❤️'];
+const chat=$('chat');
+function add(html,cls=''){const d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;chat.appendChild(d);while(chat.children.length>25)chat.firstChild.remove()}
+function line(){const u=rnd(users);const b=Math.random()<.35?'<span class="badge">★</span>':'';add(`${b}<span class="u" style="color:${colOf[u]}">${u}</span>: ${esc(rnd(phr))}`)}
+(function loop(){line();setTimeout(loop,ri(1200,4200))})();
 
-/* --- subs / raids --- */
+function send(){const v=$('say').value.trim();if(!v)return;add(`<span class="badge b-mod">⚔</span><span class="u" style="color:#bf94ff">${esc(NAME)}</span>: ${esc(v)}`);$('say').value='';
+  setTimeout(()=>add(`<span class="u" style="color:${rnd(ucol)}">${rnd(users)}</span>: ${rnd(['+++','ахах да','согласен','😂😂','ну ты даёшь','ЛЕГЕНДА'])}`),ri(700,1600))}
+$('say').onkeydown=e=>{if(e.key==='Enter'){send();$('say').blur()}};
+
+/* --- follows / subs (rare) --- */
 setInterval(()=>{const u=rnd(users),r=Math.random();
-  if(r<.4)add(`⭐ <b>${u}</b> оформил(а) подписку уровня 1 на ${ri(2,40)} мес.!`,'sys');
-  else if(r<.7)add(`🎁 <b>${u}</b> дарит ${rnd([5,10,20,50,100])} подписок в чате!`,'sys');
-  else{const n=ri(800,9000);viewers+=n;add(`🚀 <b>${rnd(side)[0]}</b> устраивает рейд с ${fmt(n)} зрителями!`,'sys');alert2('🚀',`РЕЙД от <em>${rnd(side)[0]}</em>`,`+${fmt(n)} зрителей`);}
-},ri(9000,14000));
+  if(r<.6)add(`💜 <b>${u}</b> теперь отслеживает канал!`,'sys');
+  else add(`⭐ <b>${u}</b> оформил(а) подписку!`,'sys');},ri(35000,60000));
 
-/* --- donations --- */
-const donMsgs=['Лучшая демка в моей жизни!','Бро, это гениально, продолжай!','На новый ПК 💻','Выпускай в стим, куплю первым','Передаю привет маме!','Это лучший стрим на платформе','Сделай ещё один уровень','Ты вдохновил меня стать программистом','Зачитай: чат, вы лучшие','Я знал, что ты станешь легендой','Держи на кофе ☕','Мой кот тоже смотрит 🐈','Бросил школу ради твоего стрима (шутка)','Когда коллаб с Бустером?'];
-const gifs=['💸','💰','🤑','💎','🎉','👑','🔥','🚀'];
-let goal=ri(120000,240000),goalMax=500000,topD={};
-function updGoal(){$('goalNow').textContent=fmt(goal)+' ₽';$('goalBar').style.width=Math.min(100,goal/goalMax*100)+'%';
-  const arr=Object.entries(topD).sort((a,b)=>b[1]-a[1]).slice(0,3);$('topDon').innerHTML=arr.map((a,i)=>`<span>${['🥇','🥈','🥉'][i]} ${a[0]} ${fmt(a[1])} ₽</span>`).join('');}
-updGoal();
+/* --- hearts --- */
+function heart(){const h=document.createElement('div');h.className='heart';h.textContent=rnd(['💜','❤️','💗','🔥','😂']);h.style.setProperty('--dx',ri(-30,10)+'px');$('hearts').appendChild(h);setTimeout(()=>h.remove(),2700)}
+setInterval(()=>{if(Math.random()<.6)heart()},900);
+
+/* --- donations (small) --- */
+const donMsgs=['Передай прохожему привет от чата!','Спроси как у него дела 🙂','Пусть помашет в камеру 👋','Прохожему на кофе ☕','Скажи ему что он красавчик','Пусть скажет «всем привет» чату','Спроси, какая у него любимая песня','Прочитай вслух: ты сегодня лучший!','Пусть станцует 10 секунд 💃','Спроси, верит ли он в инопланетян 👽','Вы оба в прямом эфире, улыбнитесь!','Спроси совет, как стать счастливым','Держи на шаурму 🌯','Задай ему вопрос: кошки или собаки?'];
+let goal=ri(2500,6000);const goalMax=15000;
+function upd(){$('gnow').textContent=fmt(goal)+' ₽';$('gbar').style.width=Math.min(100,goal/goalMax*100)+'%'}
+upd();
 const q=[];let busy=false;
-function alert2(g,t,m){q.push([g,t,m]);if(!busy)next();}
-function next(){if(!q.length){busy=false;return}busy=true;const[g,t,m]=q.shift();$('aGif').textContent=g;$('aT').innerHTML=t;$('aM').textContent=m;$('alert').classList.add('show');ding();speak(m);setTimeout(()=>{$('alert').classList.remove('show');setTimeout(next,600)},5200);}
-function donate(){const u=rnd(users);const big=Math.random()<.12;const sum=big?rnd([5000,10000,15000,25000,50000]):rnd([100,150,200,228,300,500,777,1000,1337,1500,2000]);const m=rnd(donMsgs);
-  goal+=sum;topD[u]=(topD[u]||0)+sum;updGoal();$('lastDon').textContent=`${u} — ${fmt(sum)} ₽`;
-  add(`💰 <b>${u}</b> задонатил(а) <b>${fmt(sum)} ₽</b>: ${esc(m)}`,'don');
-  alert2(big?'💎':rnd(gifs),`<em>${u}</em> — ${fmt(sum)} ₽`,m);
-  setTimeout(donate,ri(6000,15000));}
-setTimeout(donate,2500);
+function show(g,t,m){q.push([g,t,m]);if(!busy)next()}
+function next(){if(!q.length){busy=false;return}busy=true;const[g,t,m]=q.shift();$('ag').textContent=g;$('at').innerHTML=t;$('am').textContent=m;$('alert').classList.add('show');ding();speak(m);
+  setTimeout(()=>{$('alert').classList.remove('show');setTimeout(next,500)},6500)}
+function donate(){const u=rnd(users),sum=Math.random()<.08?rnd([500,777,1000]):rnd([50,50,69,100,100,100,150,200,228,300]),m=rnd(donMsgs);
+  goal+=sum;upd();add(`💰 <b>${u}</b> — <b>${sum} ₽</b>: ${esc(m)}`,'don');show(sum>=500?'💎':rnd(['💸','💰','🤑','🎉']),`<em>${u}</em> — ${sum} ₽`,m);
+  setTimeout(donate,ri(25000,50000))}
+setTimeout(donate,ri(6000,10000));
 
-/* --- sound --- */
+/* --- sound: unlocked by the first tap anywhere --- */
 let ac=null,sound=false;
-function ding(){if(!sound)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const n=ac.currentTime;[880,1175,1568,2093].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,n+i*.09);g.gain.linearRampToValueAtTime(.18,n+i*.09+.02);g.gain.exponentialRampToValueAtTime(.001,n+i*.09+.5);o.connect(g).connect(ac.destination);o.start(n+i*.09);o.stop(n+i*.09+.55)})}catch(e){}}
-function speak(t){if(!sound||!window.speechSynthesis)return;try{setTimeout(()=>{const u=new SpeechSynthesisUtterance(t);u.lang='ru-RU';u.rate=1.05;speechSynthesis.speak(u)},900)}catch(e){}}
-function go(){sound=true;$('start').remove();ding();}
-$('start').onclick=e=>{if(e.target.id==='pickFile'||e.target.id==='file')return;go();startCam();};
-$('pickFile').onclick=()=>$('file').click();
-$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;go();const v=$('vid');v.srcObject=null;v.src=URL.createObjectURL(f);v.loop=true;v.muted=false;v.classList.add('file');v.play();bigMode();};
-
-/* --- webcam --- */
-// your video goes fullscreen, the demo shrinks into the corner window
-function bigMode(){const p=document.querySelector('.player'),c=$('cam');$('camFake').style.display='none';p.insertBefore($('vid'),p.firstChild);c.insertBefore($('game'),c.firstChild);c.classList.add('demo');$('camTag').textContent='ДЕМКА';rs();}
-async function startCam(){try{const s=await navigator.mediaDevices.getUserMedia({video:true,audio:false});$('vid').srcObject=s;bigMode();}catch(e){$('camFake').innerHTML='<div class="face">😎</div>'+NAME;}}
-$('camFake').onclick=startCam;
-
-/* --- the "demo": auto-playing neon shooter --- */
-const cv=$('game'),cx=cv.getContext('2d');let W,H;
-function rs(){W=cv.width=cv.clientWidth*devicePixelRatio;H=cv.height=cv.clientHeight*devicePixelRatio}addEventListener('resize',rs);rs();
-const stars=Array.from({length:160},()=>({x:Math.random(),y:Math.random(),z:Math.random()*.9+.1}));
-const ship={x:.3,y:.5,ty:.5};let bullets=[],foes=[],parts=[],score=0,combo=0,shake=0,tt=0;
-function boom(x,y,c){for(let i=0;i<26;i++){const a=Math.random()*6.28,s=Math.random()*.012;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,c})}shake=8}
-function frame(){tt++;const S=Math.min(W,H);
-  cx.save();if(shake>0){cx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.9;if(shake<.3)shake=0}
-  const gr=cx.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#0b0620');gr.addColorStop(1,'#1a0b3a');cx.fillStyle=gr;cx.fillRect(-10,-10,W+20,H+20);
-  // grid floor
-  cx.strokeStyle='rgba(255,79,216,.18)';cx.lineWidth=1;for(let i=0;i<20;i++){const y=H*.72+Math.pow(i/20,2)*H*.3;cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
-  for(let i=-20;i<=20;i++){cx.beginPath();cx.moveTo(W/2+i*W*.02-(tt*2%(W*.02)),H*.72);cx.lineTo(W/2+i*W*.15,H);cx.stroke()}
-  stars.forEach(s=>{s.x-=.002*s.z;if(s.x<0){s.x=1;s.y=Math.random()*.7}cx.fillStyle=`rgba(255,255,255,${s.z})`;cx.fillRect(s.x*W,s.y*H,2*s.z*devicePixelRatio,2*s.z*devicePixelRatio)});
-  // AI: follow nearest foe
-  let tgt=foes.filter(f=>f.x>ship.x).sort((a,b)=>a.x-b.x)[0];ship.ty=tgt?tgt.y:.5+Math.sin(tt/60)*.2;ship.y+=(ship.ty-ship.y)*.06;
-  if(tt%9===0)bullets.push({x:ship.x+.03,y:ship.y});
-  if(tt%ri(25,45)===0)foes.push({x:1.05,y:.12+Math.random()*.55,hp:ri(1,3),r:.02+Math.random()*.02,c:rnd(['#ff4fd8','#00e5ff','#ffcc00','#7CFF4F']),w:Math.random()*6});
-  cx.shadowBlur=20;
-  bullets.forEach(b=>{b.x+=.02;cx.fillStyle=cx.shadowColor='#00e5ff';cx.fillRect(b.x*W,b.y*H-2,S*.03,4)});
-  foes.forEach(f=>{f.x-=.004;f.w+=.08;const x=f.x*W,y=(f.y+Math.sin(f.w)*.02)*H,r=f.r*S*1.4;cx.strokeStyle=cx.shadowColor=f.c;cx.lineWidth=3;cx.beginPath();for(let k=0;k<6;k++){const a=k/6*6.28+f.w*.3;cx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r)}cx.closePath();cx.stroke();
-    bullets.forEach(b=>{if(!b.d&&Math.abs(b.x*W-x)<r&&Math.abs(b.y*H-y)<r){b.d=1;f.hp--;if(f.hp<=0&&!f.d){f.d=1;combo++;score+=100*combo;boom(f.x,f.y,f.c)}}})});
-  bullets=bullets.filter(b=>!b.d&&b.x<1.1);foes=foes.filter(f=>!f.d&&f.x>-.1);if(foes.some(f=>f.x<.02))combo=0;
-  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.l-=.02;cx.globalAlpha=Math.max(0,p.l);cx.fillStyle=cx.shadowColor=p.c;cx.fillRect(p.x*W,p.y*H,4,4)});cx.globalAlpha=1;parts=parts.filter(p=>p.l>0);
-  // ship
-  const sx=ship.x*W,sy=ship.y*H,z=S*.035;cx.fillStyle=cx.shadowColor='#b388ff';cx.beginPath();cx.moveTo(sx+z*1.4,sy);cx.lineTo(sx-z,sy-z*.8);cx.lineTo(sx-z*.5,sy);cx.lineTo(sx-z,sy+z*.8);cx.closePath();cx.fill();
-  cx.fillStyle=cx.shadowColor='#ff8a00';cx.beginPath();cx.moveTo(sx-z*.6,sy-z*.25);cx.lineTo(sx-z*(1.2+Math.random()*.6),sy);cx.lineTo(sx-z*.6,sy+z*.25);cx.fill();
-  cx.shadowBlur=0;
-  // HUD
-  cx.fillStyle='#fff';cx.font=`900 ${S*.05}px sans-serif`;cx.textAlign='center';cx.fillText('NEON RUSH — DEMO v0.9',W/2,H*.1);
-  cx.font=`700 ${S*.035}px monospace`;cx.fillText('SCORE '+String(score).padStart(7,'0'),W/2,H*.16);
-  if(combo>2){cx.fillStyle='#ffcc00';cx.font=`900 ${S*.04+Math.sin(tt/4)*2}px sans-serif`;cx.fillText('COMBO x'+combo+'!',W/2,H*.22)}
-  cx.restore();requestAnimationFrame(frame)}
-frame();
+function unlock(){if(sound)return;sound=true;$('hint').style.opacity=0;setTimeout(()=>$('hint').remove(),600);try{ac=new(window.AudioContext||window.webkitAudioContext)();speechSynthesis&&speechSynthesis.speak(new SpeechSynthesisUtterance(''))}catch(e){}}
+addEventListener('pointerdown',unlock,{once:false});
+setTimeout(()=>{const h=$('hint');if(h)h.style.opacity=0},6000);
+function ding(){if(!sound||!ac)return;try{const n=ac.currentTime;[988,1319,1760].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,n+i*.1);g.gain.linearRampToValueAtTime(.2,n+i*.1+.02);g.gain.exponentialRampToValueAtTime(.001,n+i*.1+.45);o.connect(g).connect(ac.destination);o.start(n+i*.1);o.stop(n+i*.1+.5)})}catch(e){}}
+function speak(t){if(!sound||!window.speechSynthesis)return;setTimeout(()=>{try{const u=new SpeechSynthesisUtterance(t);u.lang='ru-RU';u.rate=1.05;speechSynthesis.speak(u)}catch(e){}},800)}
 </script>
 </body>
 </html>
